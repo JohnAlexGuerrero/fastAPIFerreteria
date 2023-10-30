@@ -1,6 +1,13 @@
 from fastapi import FastAPI
 
+from db.database import database
+from models.product import Product, Units
+
 app = FastAPI()
+
+database.create_tables([
+    Units, Product    
+])
 
 @app.get('/')
 async def home():
