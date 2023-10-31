@@ -1,6 +1,7 @@
 from db.database import database
 from peewee import Model
-from peewee import CharField, IntegerField, DecimalField, ForeignKeyField, DateField
+from datetime import datetime
+from peewee import CharField, IntegerField, DecimalField, ForeignKeyField, DateTimeField
 
 from models.product import Product
 
@@ -10,8 +11,7 @@ class BaseModel(Model):
 
 class Inventory(BaseModel):
     product = ForeignKeyField(Product, backref='inventories')
-    stock = IntegerField(default=0)
-    cost = DecimalField(max_digits=10 , decimal_places=2, default=0.0)
-    price = DecimalField(max_digits=10 ,decimal_places=2, default=0.0)
-    createdAt = DateField()
-    updatedAt = DateField()
+    amount = IntegerField(default=0)
+    price = DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    createdAt = DateTimeField(default=datetime.now)
+    updatedAt = DateTimeField(default=datetime.now)
