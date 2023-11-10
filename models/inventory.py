@@ -14,4 +14,3 @@ class Inventory(BaseModel):
     amount = IntegerField(default=0)
     price = DecimalField(max_digits=10, decimal_places=2, default=0.0)
     createdAt = DateTimeField(default=datetime.now)
-    updatedAt = DateTimeField(default=datetime.now)

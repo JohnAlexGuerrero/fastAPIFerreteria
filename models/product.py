@@ -20,6 +20,7 @@ class Product(BaseModel):
     code = CharField(max_length=10, unique=True)
     amount = IntegerField(default=0)
     cost = DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    price = DecimalField(max_digits=10, decimal_places=2, default=0.0)
     unit = ForeignKeyField(Units, backref='products')
     createdAt = DateTimeField(default=datetime.now)
     updatedAt = DateTimeField(default=datetime.now)

@@ -18,11 +18,4 @@ for each row
     end $$
 delimiter ;
 
-delimiter $$
-create trigger update_cost_product
-before insert on inventory
-for each row
-	begin
-		update product set  where id = new.product_id;
-    end $$
-delimiter ;
+
