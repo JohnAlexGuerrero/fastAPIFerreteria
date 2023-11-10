@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Annotated
 from secrets import token_hex
 
-from schemas.product import Item
+from schemas.product import Item, PriceProduct
 from schemas.inventory import EntryItem
 
 from db.database import database
@@ -22,6 +22,10 @@ def get_product_db(id:int)->Product:
     product = Product.get(Product.id == id)
     return product
 
+'''# function for get registers of inventory table with id'''
+def all_inventories_db(id)->[]:
+    items = Inventory.select().where(Inventory.product_id == id).order_by(Inventory.createdAt)
+    return [item for item in items]
 # @app.get('/')
 # async def home():
 #     return {"message":"Hello World"}
@@ -33,9 +37,13 @@ async def get_products():
     
     return {"items": items}
 
-# @app.get('/inventory/p/:id')
-# async def get_product(id):
-#     return {}
+@app.patch('/products/update/price/', status_code=202)
+async def update_price(price_product: PriceProduct):
+    p = dict(price_product)
+    product = Product.update(price=p['price'], updatedAt=p['createdAt']).where(Product.id == p['product_id'])
+    if product != None:
+        product.execute()
+    return {"message":"precio actualizado."}
 
 @app.post('/product/new')
 async def create_product(item: Item):
@@ -43,12 +51,24 @@ async def create_product(item: Item):
     product = Product.create(name=name, code=code, unit_id=unit_id)
     return {"item_created": product}
 
-# @app.put('/product/:id/update')
-# async def update_product(id):
-#     return {}
+@app.put('/product/:id/{item_id}')
+async def show_product(item_id:int):
+    product = get_product_db(item_id)
+    items = all_inventories_db(item_id)
+    
+    data = {
+            "id": product.id,
+            "name": product.name,
+            "amount": product.amount,
+            "unit": product.unit.name,
+            "cost": product.cost,
+            "price": product.price,
+        }
+    
+    return {"item":data, "inventory":items}
 
 @app.post('/inventory/new', status_code=201)
-async def create_item_inventory(item: EntryItem):
+async def add_item_inventory(item: EntryItem):
     item = Inventory.create(**dict(item))
     return {"message":'regitro ingresado con exito.'}
 

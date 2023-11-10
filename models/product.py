@@ -24,4 +24,4 @@ class Product(BaseModel):
     unit = ForeignKeyField(Units, backref='products')
     createdAt = DateTimeField(default=datetime.now)
     updatedAt = DateTimeField(default=datetime.now)
-    
+ 
