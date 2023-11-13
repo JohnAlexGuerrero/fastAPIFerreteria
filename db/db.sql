@@ -6,6 +6,7 @@ use soluciones_ferreteras;
 
 show tables;
 
+
 /* triggers */
 delimiter $$
 create trigger update_stock_product
@@ -18,4 +19,7 @@ for each row
     end $$
 delimiter ;
 
+delimiter $$
+
+delimiter ;
 

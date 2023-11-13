@@ -1,20 +1,29 @@
 from fastapi import FastAPI, UploadFile, File
 import pandas as pd
 from typing import Annotated
-from secrets import token_hex
+from typing import List
 
 from schemas.product import Item, PriceProduct
 from schemas.inventory import EntryItem
+from schemas.client import ClientSchema
+from schemas.sales import SalesData, OrderDetail
+from schemas.shopping import ShoppingSchema
 
 from db.database import database
 from models.product import Product, Units
 from models.inventory import Inventory
+from models.client import Client
+from models.sales import Invoice, OrderDetail
+from models.shopping import Shopping, ShoppingDetail
 
 app = FastAPI(title='Soluciones Ferreteras Api')
 
 database.create_tables([
     Units, Product,
-    Inventory   
+    Inventory,
+    Client,
+    Invoice, OrderDetail,
+    Shopping, ShoppingDetail
 ])
 
 '''# function for get one item of product table'''
@@ -26,9 +35,6 @@ def get_product_db(id:int)->Product:
 def all_inventories_db(id)->[]:
     items = Inventory.select().where(Inventory.product_id == id).order_by(Inventory.createdAt)
     return [item for item in items]
-# @app.get('/')
-# async def home():
-#     return {"message":"Hello World"}
 
 @app.get('/products/', status_code=200)
 async def get_products():
@@ -67,10 +73,10 @@ async def show_product(item_id:int):
     
     return {"item":data, "inventory":items}
 
-@app.post('/inventory/new', status_code=201)
+# @app.post('/inventory/new', status_code=201)
 async def add_item_inventory(item: EntryItem):
     item = Inventory.create(**dict(item))
-    return {"message":'regitro ingresado con exito.'}
+    # return {"message":'regitro ingresado con exito.'}
 
 # '''
 # crear un endpoint en FastAPI que permita importar datos desde un archivo Excel para la creación de productos
@@ -100,4 +106,27 @@ async def add_item_inventory(item: EntryItem):
     
 #     for x in range(len(df)):
 #         item = Product.create(name=df.name[x], code=df.code[x],unit_id=df.unit[x])
+
+'''
+sales
+'''
+@app.post('/clients/new', status_code=201)
+async def create_client(client:ClientSchema):
+    client = Client.create(**dict(client))
+    return {"message":"cliente fue creado con exito."}
+
+@app.post('/sales/', status_code=201)
+async def save_sale(data:SalesData):
+    # print(dict(data))
+    print(data.orders)
     
+    return {}
+
+@app.post('/shoppings/', status_code=201)
+async def add_shopping(shopping: ShoppingSchema, order: List[EntryItem]):
+    new_shopping = Shopping.create(**dict(shopping))
+    if new_shopping:
+        for item in order:
+            add_item_inventory(item)
+
+    return {"message":"fue agregado con exito."}
