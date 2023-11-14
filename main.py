@@ -73,10 +73,17 @@ async def show_product(item_id:int):
     
     return {"item":data, "inventory":items}
 
-# @app.post('/inventory/new', status_code=201)
+@app.post('/inventory/new', status_code=201)
 async def add_item_inventory(item: EntryItem):
     item = Inventory.create(**dict(item))
-    # return {"message":'regitro ingresado con exito.'}
+
+def add_item_shopping(id_shopping: int, item: EntryItem):
+    data = dict(item)
+    data['shopping_id'] = id_shopping
+    data['total']: data.price * data.amount
+    
+    item = ShoppingDetail.create(**data)
+    print(data)
 
 # '''
 # crear un endpoint en FastAPI que permita importar datos desde un archivo Excel para la creación de productos
@@ -124,9 +131,14 @@ async def save_sale(data:SalesData):
 
 @app.post('/shoppings/', status_code=201)
 async def add_shopping(shopping: ShoppingSchema, order: List[EntryItem]):
-    new_shopping = Shopping.create(**dict(shopping))
-    if new_shopping:
+    bill_dict = dict(shopping)
+    new_shopping = Shopping.create(**bill_dict)
+    
+    if new_shopping != None:
         for item in order:
-            add_item_inventory(item)
-
+            add_item_shopping(new_shopping.id, item)
+            print(new_shopping.id)
+    else:
+        return {"message": 'no fue posible.'}
+    
     return {"message":"fue agregado con exito."}
